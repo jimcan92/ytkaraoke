@@ -26,9 +26,9 @@ export const playing = {
 	},
 	next() {
 		const fvf = _queue.queue.shift();
-		_queue.playing = fvf;
+		if (fvf) _queue.playing = fvf;
 	},
-	clear() {
+	stop() {
 		_queue.queue = [];
 		_queue.playing = undefined;
 	},

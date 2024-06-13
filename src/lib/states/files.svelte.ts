@@ -14,7 +14,6 @@ async function download(v: Video) {
 	_dlProgress = 0;
 	let unListen = () => {};
 
-	// if (_downloading && !(await exists(_downloading.id))) {
 	if (_downloading) {
 		unListen = await listen(`${Event.DOWNLOAD_PROGRESS}${_downloading.id}`, (event) => {
 			const { progress } = event.payload as DownloadProgressEvent;

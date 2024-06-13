@@ -171,10 +171,10 @@ async fn search(query: &str, app: AppHandle) -> Result<Vec<SearchVideo>, ()> {
     let mut video_results: Vec<SearchVideo> = Vec::new();
     for search_result in res {
         if let SearchResult::Video(video) = search_result {
-            //exclude live streams
             let exists_in_db = app.db(|db| in_db(video.clone().id, db)).unwrap();
 
-            if video.duration > 0 && !exists_in_db {
+            if video.duration > 0 && !exists_in_db && video.title.to_lowercase().contains("karaoke")
+            {
                 video_results.push(video)
             }
         }

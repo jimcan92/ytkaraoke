@@ -1,9 +1,5 @@
 <script>
 	import { files } from '$lib/states/files.svelte';
-
-	$effect(() => {
-		$inspect(files);
-	});
 </script>
 
 {#if files.downloading}

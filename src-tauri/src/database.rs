@@ -38,8 +38,6 @@ pub fn init_db(app_handle: &AppHandle) -> Result<Connection, Error> {
     fs::create_dir_all(&app_dir).expect("The app data directory should be created.");
     let sqlite_path = app_dir.join("data.db");
 
-    println!("{:?}", sqlite_path.as_path());
-
     let mut db = Connection::open(sqlite_path)?;
 
     let mut user_pragma = db.prepare("PRAGMA user_version")?;
@@ -108,5 +106,4 @@ pub fn add_video_file(file: &VideoFile, db: &Connection) -> Result<(), Error> {
 pub fn in_db(id: String, db: &Connection) -> Result<bool, Error> {
     db.prepare("SELECT * FROM videofiles WHERE id=?")?
         .exists([id])
-    // statement.exists([id])
 }

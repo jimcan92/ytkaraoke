@@ -2,10 +2,16 @@
 	import { files } from '$lib/states/files.svelte';
 	import { playing } from '$lib/states/queue.svelte';
 	import { search } from '$lib/states/search.svelte';
-	import { Download, List, ListMinus, ListPlus, Square } from 'lucide-svelte';
+	import type { VideoFile } from '$lib/types/api';
+	import { Download, List, ListMinus, ListPlus, Play, Square } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 
-	let isDisplayThumb = false;
+	let isDisplayThumb = $state(false);
+	let currentPlayingId = $state<string | undefined>();
+
+	$effect(() => {
+		currentPlayingId = playing.current?.id;
+	});
 
 	onMount(async () => {
 		await files.init();
@@ -30,44 +36,14 @@
 								{videoFile.title}
 							</p>
 						</div>
-						<button
-							onclick={() => {
-								// if (inQueue(videoFile.id)) removeFromQueue(videoFile.id);
-								// else
-								playing.add(videoFile);
-								// getVideoFiles();
-							}}
-							class:hidden={!playing.exists(videoFile.id)}
-							class:btn-info={!playing.exists(videoFile.id)}
-							class="btn btn-circle btn-accent btn-sm absolute bottom-2 right-2 z-[4] group-hover:inline-flex"
-						>
-							{#if playing.exists(videoFile.id)}
-								<ListMinus class="h-[1-rem] w-[1rem]" />
-							{:else}
-								<ListPlus class="h-[1-rem] w-[1rem]" />
-							{/if}
-						</button>
+						{@render actionButton(videoFile)}
 					</div>
 				{:else}
 					<div class="group relative rounded bg-base-200 px-4 py-2">
 						<p class="text-ellipsis text-nowrap">
 							{videoFile.title}
 						</p>
-						<button
-							onclick={() => {
-								if (playing.exists(videoFile.id)) playing.remove(videoFile.id);
-								else playing.add(videoFile);
-							}}
-							class:hidden={!playing.exists(videoFile.id)}
-							class:btn-info={!playing.exists(videoFile.id)}
-							class="btn btn-circle btn-accent btn-xs absolute bottom-2 right-2 z-[4] group-hover:inline-flex"
-						>
-							{#if playing.exists(videoFile.id)}
-								<ListMinus class="h-[1-rem] w-[1rem]" />
-							{:else}
-								<ListPlus class="h-[1-rem] w-[1rem]" />
-							{/if}
-						</button>
+						{@render actionButton(videoFile)}
 					</div>
 				{/if}
 			{/each}
@@ -88,22 +64,12 @@
 							{video.title}
 						</p>
 					</div>
-					{#if files.downloading && files.downloading.id === video.id}
-						<div
-							class="radial-progress absolute bottom-2 right-2 z-[4] bg-base-200/50 text-[0.6rem] text-accent"
-							style="--value:{files.dlProgress}; --size:2rem; --thickness: 2px;"
-							role="progressbar"
-						>
-							{files.dlProgress}%
-						</div>
-					{:else}
-						<button
-							onclick={() => files.addToDQueue(video)}
-							class="btn btn-circle btn-sm absolute bottom-2 right-2 z-[4] hidden group-hover:inline-flex"
-						>
-							<Download class="h-[1rem] w-[1rem]" />
-						</button>
-					{/if}
+					<button
+						onclick={() => files.addToDQueue(video)}
+						class="btn btn-circle btn-sm absolute bottom-2 right-2 z-[4] hidden group-hover:inline-flex"
+					>
+						<Download class="h-[1rem] w-[1rem]" />
+					</button>
 				</div>
 			{/if}
 		{/each}
@@ -133,3 +99,26 @@
 		</li>
 	</menu>
 </div>
+
+{#snippet actionButton(videoFile: VideoFile)}
+	<button
+		onclick={() => {
+			if (currentPlayingId !== videoFile.id) {
+				if (playing.exists(videoFile.id)) playing.remove(videoFile.id);
+				else playing.add(videoFile);
+			}
+		}}
+		class:animate-pulse={currentPlayingId === videoFile.id}
+		class:hidden={!playing.exists(videoFile.id) && currentPlayingId !== videoFile.id}
+		class:btn-info={!playing.exists(videoFile.id) && currentPlayingId !== videoFile.id}
+		class="btn btn-circle btn-accent btn-xs absolute bottom-2 right-2 z-[4] group-hover:inline-flex"
+	>
+		{#if currentPlayingId === videoFile.id}
+			<Play class="h-[1-rem] w-[1rem]" />
+		{:else if playing.exists(videoFile.id)}
+			<ListMinus class="h-[1-rem] w-[1rem]" />
+		{:else}
+			<ListPlus class="h-[1-rem] w-[1rem]" />
+		{/if}
+	</button>
+{/snippet}
