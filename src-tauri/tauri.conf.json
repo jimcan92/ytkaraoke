@@ -7,7 +7,7 @@
 		"distDir": "../build"
 	},
 	"package": {
-		"productName": "ytkaraoke",
+		"productName": "YouTube Karaoke",
 		"version": "1.0.0"
 	},
 	"tauri": {

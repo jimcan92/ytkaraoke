@@ -72,18 +72,8 @@
 	});
 </script>
 
-<div
-	use:shortcut={{ shift: true, code: 'KeyN', callback: playing.next }}
-	use:shortcut={{ code: 'Space', callback: pauseOrPlay }}
-	use:shortcut={{ control: true, code: 'Space', callback: playing.stop }}
-	use:shortcut={{ control: true, code: 'KeyS', callback: toggleShowControls }}
-	use:shortcut={{ code: 'F11', callback: status.toggleFullscreen }}
-	class="flex h-svh flex-col"
->
-	<div
-		class:h-[70%]={showControls}
-		class="relative flex h-full items-center justify-center bg-black"
-	>
+<div class="flex h-svh flex-col">
+	<div class="relative flex h-full items-center justify-center bg-black">
 		{#if playing.current}
 			<video
 				bind:this={videoPlayer}
@@ -105,31 +95,62 @@
 				{/if}
 			</div>
 			<div class="flex items-center justify-evenly">
-				<label class="btn btn-circle btn-ghost swap swap-rotate btn-sm">
-					<input type="checkbox" bind:checked={showControls} onclick={toggleShowControls} />
-					<Search class="swap-off h-[1.2rem] w-[1.2rem]" />
-					<X class="swap-on h-[1.2rem] w-[1.2rem]" />
-				</label>
-				<button class="btn btn-circle btn-ghost btn-sm" onclick={pauseOrPlay}>
-					{#if paused}
-						<Play class="h-[1.2rem] w-[1.2rem]" />
-					{:else}
-						<Pause class="h-[1.2rem] w-[1.2rem]" />
-					{/if}
-				</button>
-				<button onclick={playing.stop} class="btn btn-circle btn-ghost btn-sm">
-					<Square class="h-[1.2rem] w-[1.2rem]" />
-				</button>
-				<button onclick={playing.next} class="btn btn-circle btn-ghost btn-sm">
-					<ChevronLast class="h-[1.2rem] w-[1.2rem]" />
-				</button>
-				<button onclick={status.toggleFullscreen} class="btn btn-circle btn-ghost btn-sm">
-					{#if status.fullscreen}
-						<Minimize class="h-[1.2rem] w-[1.2rem]" />
-					{:else}
-						<Maximize class="h-[1.2rem] w-[1.2rem]" />
-					{/if}
-				</button>
+				<div class="tooltip" data-tip="Search songs <Ctrl + S>">
+					<label class="btn btn-circle btn-ghost swap swap-rotate btn-sm">
+						<input
+							use:shortcut={{ control: true, code: 'KeyS' }}
+							type="checkbox"
+							bind:checked={showControls}
+							onclick={toggleShowControls}
+						/>
+						<Search class="swap-off h-[1.2rem] w-[1.2rem]" />
+						<X class="swap-on h-[1.2rem] w-[1.2rem]" />
+					</label>
+				</div>
+				<div class="tooltip" data-tip={paused ? 'Play <Ctrl + Space>' : 'Pause <Ctrl + Space>'}>
+					<button
+						use:shortcut={{ control: true, code: 'Space' }}
+						class="btn btn-circle btn-ghost btn-sm"
+						onclick={pauseOrPlay}
+					>
+						{#if paused}
+							<Play class="h-[1.2rem] w-[1.2rem]" />
+						{:else}
+							<Pause class="h-[1.2rem] w-[1.2rem]" />
+						{/if}
+					</button>
+				</div>
+				<div class="tooltip" data-tip="Stop <Ctrl + Shift + Space>">
+					<button
+						use:shortcut={{ control: true, shift: true, code: 'Space' }}
+						onclick={playing.stop}
+						class="btn btn-circle btn-ghost btn-sm"
+					>
+						<Square class="h-[1.2rem] w-[1.2rem]" />
+					</button>
+				</div>
+				<div class="tooltip" data-tip="Next <Ctrl + N>">
+					<button
+						use:shortcut={{ control: true, code: 'KeyN' }}
+						onclick={playing.next}
+						class="btn btn-circle btn-ghost btn-sm"
+					>
+						<ChevronLast class="h-[1.2rem] w-[1.2rem]" />
+					</button>
+				</div>
+				<div class="tooltip" data-tip="Fullscreen <F11>">
+					<button
+						use:shortcut={{ code: 'F11' }}
+						onclick={status.toggleFullscreen}
+						class="btn btn-circle btn-ghost btn-sm"
+					>
+						{#if status.fullscreen}
+							<Minimize class="h-[1.2rem] w-[1.2rem]" />
+						{:else}
+							<Maximize class="h-[1.2rem] w-[1.2rem]" />
+						{/if}
+					</button>
+				</div>
 			</div>
 			<div>
 				{#if playing.queue.length}
